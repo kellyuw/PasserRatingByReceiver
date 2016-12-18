@@ -55,6 +55,14 @@ for yr in range(2011,2017):
 
     print 'Getting stats for year: ' + str(yr)
     for team in [get_std_team(t) for t in teams]:
+
+        #TEMPFIX: Issues with JAX and LA
+        if yr < 2016:
+            if 'JAX' in team:
+                team = 'JAC'
+            elif 'LA' in team:
+                team = 'STL'
+
         try:
             games = nflgame.games(year = yr, week = range(1,18), kind = 'REG', home = team)
             plays = nflgame.combine_plays(games)
