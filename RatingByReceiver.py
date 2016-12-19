@@ -4,20 +4,6 @@ import nflgame
 
 pd.options.mode.chained_assignment = None  # default='warn'
 
-#Convert team name into easily parsable string and get standard name from API
-def get_std_team(team):
-    tm = team.replace('-',' ')
-
-    #Rams no longer in St. Louis (so just use Rams for search)
-    if 'rams' in tm:
-        tm = 'rams'
-
-    #Get standard team name
-    stdteam = nflgame.standard_team(str(tm))
-    if 'JAC' in stdteam:
-        return 'JAX'
-    else:
-        return stdteam
 
 #Parse stats for particular stat
 def parse_play(p, s, t):
@@ -32,15 +18,11 @@ def check_val(r):
     else:
         return r
 
+#Teams
+teams = [t[0] for t in nflgame.teams]
+
 #Stat types of interest
 stat_types = ['play_num', 'pass_player', 'passing_att', 'passing_cmp', 'passing_incmp', 'passing_int', 'passing_tds', 'passing_yds', 'rec_player', 'receiving_tar', 'receiving_rec', 'receiving_yds']
-
-
-
-#Team names
-teams = ['buffalo-bills', 'miami-dolphins', 'new-england-patriots', 'new-york-jets', 'baltimore-ravens','cincinnati-bengals', 'cleveland-browns', 'pittsburgh-steelers', 'houston-texans', 'indianapolis-colts','jacksonville-jaguars', 'tennessee-titans', 'denver-broncos', 'kansas-city-chiefs', 'oakland-raiders','san-diego-chargers', 'dallas-cowboys', 'new-york-giants', 'philadelphia-eagles', 'washington-redskins',
-'chicago-bears', 'detroit-lions', 'green-bay-packers', 'minnesota-vikings', 'atlanta-falcons','carolina-panthers', 'new-orleans-saints', 'tampa-bay-buccaneers', 'arizona-cardinals','san-francisco-49ers', 'seattle-seahawks', 'st-louis-rams']
-
 
 #Set lower threshold for pass attempts here
 pass_att_thr = 50
@@ -54,14 +36,8 @@ for yr in range(2011,2017):
     all_plays = df[1:]
 
     print 'Getting stats for year: ' + str(yr)
-    for team in [get_std_team(t) for t in teams]:
 
-        #TEMPFIX: Issues with JAX and LA
-        if yr < 2016:
-            if 'JAX' in team:
-                team = 'JAC'
-            elif 'LA' in team:
-                team = 'STL'
+    for team in teams:
 
         try:
             games = nflgame.games(year = yr, week = range(1,18), kind = 'REG', home = team)
